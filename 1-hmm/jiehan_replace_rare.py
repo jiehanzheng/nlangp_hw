@@ -29,7 +29,7 @@ def replace_with_rare(input, word):
       if tokens[0] == word:
         tokens[0] = "_RARE_"
         print "  > Line replaced with", tokens
-        input[i] = ' '.join(tokens)
+        input[i] = ' '.join(tokens) + "\n"
     except IndexError:
       continue
 
