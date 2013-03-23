@@ -8,7 +8,8 @@ tag_counts = dict()
 def count_corpus(y, x=None):
   """
   Look in the counts that count_freqs.py generated, and return number of 
-  occurrences of word x, or occurrences of word x and tag y, if y is given.
+  occurrences of tag y, or number of occurrences of tag y and word x, 
+  if x is given.
 
   """
 
