@@ -2,87 +2,72 @@ from __future__ import division
 from collections import defaultdict
 import sys
 
-# hehehe let's be lazy and steal some functions from this professor's script
-import count_freqs
-
 
 counts = dict()
 tag_counts = dict()
 
 
-# def viterbi(k, u, v, x, pi={(0,'*','*'): 1}, bp=dict(), K=None, outermost=True):
-#   """ We take care of STOP symbol already, so STOP shouldn't be passed in """
+def viterbi(x_list):
+  """ Given list x, return a list containing corresponding tags. """
+  # n is the number of words
+  n = len(x_list)
 
-#   # see if we have something already cached
-#   if (k, u, v) in pi:
-#     return pi[(k, u, v)]
+  # list -> dictionary
+  x = dict()
+  x['-1'] = '*'
+  x['0'] = '*'
+  for i, x_list_item in enumerate(x_list):
+    x[str(i+1)] = x_list_item
 
-#   if k == 0:
-#     raise Exception("Oh no!  If k == 0 we should have returned!")
+  # print x
 
-#   # K[] stores possible tags for its corresponding index locations
-#   if K is None:
-#     # for most of the terms, K can be the two tags
-#     K = defaultdict(lambda: {'I-GENE', 'O'})
+  # allowed tags for each position
+  K = defaultdict(lambda: {'I-GENE', 'O'})
+  K['-1'] = {'*'}
+  K['0'] = {'*'}
 
-#     # first two terms (beginning of sentence) should always be *
-#     K['-1'] = {'*'}
-#     K['0'] = {'*'}
+  # store results
+  pi = {(0,'*','*'): 1}
+  bp = dict()
 
-#   for u in K[str(k-1)]:
-#     for v in K[str(k)]:
-#       best_pi = 0
-#       best_w = '?'
-#       for w in K[str(k-2)]:
+  for k in range(1,n+1):
+    for u in K[str(k-1)]:
+      for v in K[str(k)]:
+        max_pi = 0
+        for w in K[str(k-2)]:
+          # print k,x[str(k)]+'->'+w,u,v,
+          this_pi = pi[(k-1,w,u)] * transition(v,w,u) * emission(x[str(k)],v)
+          # print "=", this_pi, '(p:', pi[(k-1,w,u)],'t:', transition(v,w,u), 'e:', emission(x[str(k)],v), ')',
+          # print "curmax =", max_pi,
+          if this_pi >= max_pi:
+            max_pi = this_pi
+            max_pi_w = w
+            # print "[max]",
+          # print
+        pi[(k,u,v)] = max_pi
+        bp[(k,u,v)] = max_pi_w
 
-#         if outermost:
-#           print v,u,w,x[k]
-#           print "v", viterbi(k-1,w,u,x,pi=pi,bp=bp,K=K,outermost=False)
-#           print "t", transition(v,w,u)
-#           print "e", emission(x[k],v)
-#           print
+  # prepare y to return
+  y = dict()
 
-#         this_pi = viterbi(k-1,w,u,x,pi=pi,bp=bp,K=K,outermost=False) * transition(v,w,u) * emission(x[k],v)
-#         if this_pi >= best_pi:
-#           best_pi = this_pi
-#           best_w = w
-#       pi[(k,u,v)] = best_pi
-#       bp[(k,u,v)] = best_w
+  # set last two tags
+  max_pi = 0
+  for u in K[str(n-1)]:
+    for v in K[str(n)]:
+      this_pi = pi[(n,u,v)] * transition('STOP',u,v)
+      if this_pi >= max_pi:
+        y[str(n-1)] = u
+        y[str(n)] = v
 
-#   # let's see who is the best friend with STOP symbol
-#   # if we are the first function call (end of sentence)
-#   if not outermost:
-#     if (k, u, v) in pi:
-#       return pi[(k, u, v)]
-#     else:
-#       raise Exception("weird")
-#   else:
-#     best_pi = 0
-#     best_uv = ('?', '?')
-#     for u in K[str(k-1)]:
-#       for v in K[str(k)]:
-#         this_pi = viterbi(k,u,v,x,pi=pi,bp=bp,K=K,outermost=False) * transition('STOP',u,v)
-#       if this_pi >= best_pi:
-#         best_pi = this_pi
-#         best_uv = (u,v)
+  for k in range(n-2, 1-1, -1):
+    y[str(k)] = bp[(k+2,y[str(k+1)],y[str(k+2)])]
 
-#     y = dict()
-#     y[str(k)] = v
-#     y[str(k-1)] = u
+  # print bp
+  # print y
 
-#     print k, y[str(k)]
-#     print k-1, y[str(k-1)]
-    
-#     for kay in range(k-2, 1-1, -1):
-#       print kay,
-#       y[str(kay)] = bp[(kay+2, y[str(kay+1)], y[str(kay+2)])]
-#       print y[str(kay)]
-
-#     return y
-
-
-def viterbi(x):
-  
+  # dict --> list
+  # print sorted([int(i) for i in y.iterkeys()])
+  return [y[str(i)] for i in sorted([int(i) for i in y.iterkeys()]) if int(i) >= 1]
 
 
 def emission(x, y):
@@ -174,9 +159,27 @@ if __name__ == "__main__":
   dev_lines = dev_lines[:]
   print len(dev_lines), "lines read."
 
-  print viterbi(14, 'I-GENE', 'O', [None, "Therefore", ",", "we", "suggested", "that", "both", "proteins", "might", "belong", "to", "the", "PLTP", "family", "."])
-  # print viterbi(1, '*', 'O', [None, "Therefore"])
+  # print viterbi(["Therefore", ",", "we", "suggested", "that", "both", "proteins", "might", "belong", "to", "the", "PLTP", "family", "."])
+  # print viterbi(["Finally",",","a","chromogenic","method","was","used",",","based","on","thrombin","inhibition","and","the","substrate","S","-","2238","."])
+  # print viterbi(["Molecular","cloning",",","genomic","mapping",",","and","expression","of","two","secretor","blood","group","alpha","(","1",",","2",")","fucosyltransferase","genes","differentially","regulated","in","mouse","uterine","epithelium","and","gastrointestinal","tract","."])
 
+  out_lines = []
+
+  sentence_buffer = []
+  for dev_line in dev_lines:
+    if len(dev_line.strip()):
+      sentence_buffer.append(dev_line.strip())
+    else:  # end of sentence
+      print sentence_buffer
+      tags = viterbi(sentence_buffer)
+      print tags
+      print
+
+      for i, word in enumerate(sentence_buffer):
+        out_lines.append(word + ' ' +tags[i]+'\n')
+      out_lines.append('\n')
+
+      sentence_buffer = []
 
   # TESTS FOR count_ngram()
   # print "OOO"
@@ -187,17 +190,7 @@ if __name__ == "__main__":
   # print "uvw/uv"
   # print transition("O", "O", "O")
 
-
-
-  # for i, dev_line in enumerate(dev_lines):
-  #   dev_word = dev_line.strip()
-  #   if dev_word:
-  #     dev_line = dev_word + ' '
-  #     dev_line = dev_line + ('O' if emission(x=dev_word, y='O') > emission(x=dev_word, y='I-GENE') else 'I-GENE')
-  #     dev_line = dev_line + "\n"
-  #     dev_lines[i] = dev_line
-
-  # print "Writing dev file..."
-  # # out_file = open("gene_dev.p1.out","w")
-  # out_file = open("gene_test.p1.out","w")
-  # out_file.writelines(dev_lines)
+  print "Writing dev file..."
+  # out_file = open("gene_dev.p2.out","w")
+  out_file = open("gene_test.p2.out","w")
+  out_file.writelines(out_lines)
