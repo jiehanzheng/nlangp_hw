@@ -10,54 +10,79 @@ counts = dict()
 tag_counts = dict()
 
 
-def viterbi(k, u, v, x, pi={(0,'*','*'): 1}, bp=dict(), K=None, outermost=True):
-  """ We take care of STOP symbol already, so STOP shouldn't be passed in """
+# def viterbi(k, u, v, x, pi={(0,'*','*'): 1}, bp=dict(), K=None, outermost=True):
+#   """ We take care of STOP symbol already, so STOP shouldn't be passed in """
 
-  # see if we have something already cached
-  if (k, u, v) in pi:
-    return pi[(k, u, v)]
+#   # see if we have something already cached
+#   if (k, u, v) in pi:
+#     return pi[(k, u, v)]
 
-  if k == 0:
-    raise Exception("wtf?!  if k == 0 we should have returned!")
+#   if k == 0:
+#     raise Exception("Oh no!  If k == 0 we should have returned!")
 
-  # K[] stores possible tags for its corresponding index locations
-  if K is None:
-    # for most of the terms, K can be the two tags
-    K = defaultdict(lambda: {'I-GENE', 'O'})
+#   # K[] stores possible tags for its corresponding index locations
+#   if K is None:
+#     # for most of the terms, K can be the two tags
+#     K = defaultdict(lambda: {'I-GENE', 'O'})
 
-    # first two terms (beginning of sentence) should always be *
-    K['-1'] = {'*'}
-    K['0'] = {'*'}
+#     # first two terms (beginning of sentence) should always be *
+#     K['-1'] = {'*'}
+#     K['0'] = {'*'}
 
-  for v in K[str(k)]:
-    for u in K[str(k-1)]:
-      best_pi = 0
-      best_w = '?'
-      for w in K[str(k-2)]:
-        this_pi = viterbi(k-1,w,u,x,pi=pi,bp=bp,K=K,outermost=False) * transition(v,w,u) * emission(x[k],v)
-        if this_pi > best_pi:
-          best_pi = this_pi
-          best_w = w
-      pi[(k,u,v)] = best_pi
-      bp[(k,u,v)] = best_w
+#   for u in K[str(k-1)]:
+#     for v in K[str(k)]:
+#       best_pi = 0
+#       best_w = '?'
+#       for w in K[str(k-2)]:
 
-  print "pi at", k, u, v, "is", pi
+#         if outermost:
+#           print v,u,w,x[k]
+#           print "v", viterbi(k-1,w,u,x,pi=pi,bp=bp,K=K,outermost=False)
+#           print "t", transition(v,w,u)
+#           print "e", emission(x[k],v)
+#           print
 
-  # let's see who is the best friend with STOP symbol
-  # if we are the first function call (end of sentence)
-  if not outermost:
-    return best_pi
-  else:
-    best_pi = 0
-    best_uv = ('?', '?')
-    for u in K[str(k-1)]:
-      for v in K[str(k)]:
-        this_pi = viterbi(k,u,v,x,pi=pi,bp=bp,K=K,outermost=False) * transition('STOP',u,v)
-      if this_pi > best_pi:
-        best_pi = this_pi
-        best_uv = (u,v)
+#         this_pi = viterbi(k-1,w,u,x,pi=pi,bp=bp,K=K,outermost=False) * transition(v,w,u) * emission(x[k],v)
+#         if this_pi >= best_pi:
+#           best_pi = this_pi
+#           best_w = w
+#       pi[(k,u,v)] = best_pi
+#       bp[(k,u,v)] = best_w
 
-    return best_uv
+#   # let's see who is the best friend with STOP symbol
+#   # if we are the first function call (end of sentence)
+#   if not outermost:
+#     if (k, u, v) in pi:
+#       return pi[(k, u, v)]
+#     else:
+#       raise Exception("weird")
+#   else:
+#     best_pi = 0
+#     best_uv = ('?', '?')
+#     for u in K[str(k-1)]:
+#       for v in K[str(k)]:
+#         this_pi = viterbi(k,u,v,x,pi=pi,bp=bp,K=K,outermost=False) * transition('STOP',u,v)
+#       if this_pi >= best_pi:
+#         best_pi = this_pi
+#         best_uv = (u,v)
+
+#     y = dict()
+#     y[str(k)] = v
+#     y[str(k-1)] = u
+
+#     print k, y[str(k)]
+#     print k-1, y[str(k-1)]
+    
+#     for kay in range(k-2, 1-1, -1):
+#       print kay,
+#       y[str(kay)] = bp[(kay+2, y[str(kay+1)], y[str(kay+2)])]
+#       print y[str(kay)]
+
+#     return y
+
+
+def viterbi(x):
+  
 
 
 def emission(x, y):
