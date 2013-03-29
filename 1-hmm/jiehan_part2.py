@@ -154,8 +154,8 @@ if __name__ == "__main__":
   print len(counts_lines), "lines read and cached."
 
   print "Reading dev file..."
-  # dev_lines = open("gene.dev","r").readlines()
-  dev_lines = open("gene.test","r").readlines()
+  dev_lines = open("gene.dev","r").readlines()
+  # dev_lines = open("gene.test","r").readlines()
   dev_lines = dev_lines[:]
   print len(dev_lines), "lines read."
 
@@ -191,6 +191,6 @@ if __name__ == "__main__":
   # print transition("O", "O", "O")
 
   print "Writing dev file..."
-  # out_file = open("gene_dev.p2.out","w")
-  out_file = open("gene_test.p2.out","w")
+  out_file = open("gene_dev.p2.out","w")
+  # out_file = open("gene_test.p2.out","w")
   out_file.writelines(out_lines)
