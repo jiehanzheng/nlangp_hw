@@ -2,6 +2,8 @@ from __future__ import division
 from collections import defaultdict
 import sys
 
+from jiehan_part3_preprocessor import word_class
+
 
 counts = dict()
 tag_counts = dict()
@@ -34,14 +36,12 @@ def viterbi(x_list):
     for u in K[str(k-1)]:
       for v in K[str(k)]:
         max_pi = 0
-        max_pi_w = None
         for w in K[str(k-2)]:
           # print k,x[str(k)]+'->'+w,u,v,
           this_pi = pi[(k-1,w,u)] * transition(v,w,u) * emission(x[str(k)],v)
           # print "=", this_pi, '(p:', pi[(k-1,w,u)],'t:', transition(v,w,u), 'e:', emission(x[str(k)],v), ')',
           # print "curmax =", max_pi,
-
-          if this_pi > max_pi or max_pi_w is None:
+          if this_pi >= max_pi:
             max_pi = this_pi
             max_pi_w = w
             # print "[max]",
@@ -53,11 +53,11 @@ def viterbi(x_list):
   y = dict()
 
   # set last two tags
-  max_pi = -1
+  max_pi = 0
   for u in K[str(n-1)]:
     for v in K[str(n)]:
       this_pi = pi[(n,u,v)] * transition('STOP',u,v)
-      if this_pi > max_pi:
+      if this_pi >= max_pi:
         y[str(n-1)] = u
         y[str(n)] = v
 
@@ -119,7 +119,7 @@ def count_wordtag(y, x=None):
 
   # before we use _RARE_, check and see if it is really rare
   if (('WORDTAG', 'O', x) not in counts) and (('WORDTAG', 'I-GENE', x) not in counts):
-    return counts[('WORDTAG', y, '_RARE_')]
+    return counts[('WORDTAG', y, word_class(x))]
 
   return 0
 
@@ -151,13 +151,13 @@ def cache_counts(lines):
 
 if __name__ == "__main__":
   print "Reading counts..."
-  counts_lines = open("gene.counts","r").readlines()
+  counts_lines = open("gene_with_better_classes.counts","r").readlines()
   cache_counts(counts_lines)
   print len(counts_lines), "lines read and cached."
 
   print "Reading dev file..."
-  # dev_lines = open("gene.dev","r").readlines()
-  dev_lines = open("gene.test","r").readlines()
+  dev_lines = open("gene.dev","r").readlines()
+  # dev_lines = open("gene.test","r").readlines()
   dev_lines = dev_lines[:]
   print len(dev_lines), "lines read."
 
@@ -172,10 +172,10 @@ if __name__ == "__main__":
     if len(dev_line.strip()):
       sentence_buffer.append(dev_line.strip())
     else:  # end of sentence
-      # print sentence_buffer
+      print sentence_buffer
       tags = viterbi(sentence_buffer)
-      # print tags
-      # print
+      print tags
+      print
 
       for i, word in enumerate(sentence_buffer):
         out_lines.append(word + ' ' +tags[i]+'\n')
@@ -193,6 +193,6 @@ if __name__ == "__main__":
   # print transition("O", "O", "O")
 
   print "Writing dev file..."
-  # out_file = open("gene_dev.p2.out","w")
-  out_file = open("gene_test.p2.out","w")
+  out_file = open("gene_dev.p3.out","w")
+  # out_file = open("gene_test.p3.out","w")
   out_file.writelines(out_lines)
