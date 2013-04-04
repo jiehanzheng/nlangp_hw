@@ -33,7 +33,7 @@ def viterbi(x_list):
   for k in range(1,n+1):
     for u in K[str(k-1)]:
       for v in K[str(k)]:
-        max_pi = 0
+        max_pi = -1
         max_pi_w = None
         for w in K[str(k-2)]:
           # print k,x[str(k)]+'->'+w,u,v,
@@ -41,11 +41,12 @@ def viterbi(x_list):
           # print "=", this_pi, '(p:', pi[(k-1,w,u)],'t:', transition(v,w,u), 'e:', emission(x[str(k)],v), ')',
           # print "curmax =", max_pi,
 
-          if this_pi > max_pi or max_pi_w is None:
+          if this_pi >= max_pi or max_pi_w is None:
             max_pi = this_pi
             max_pi_w = w
             # print "[max]",
           # print
+        # print 'bp ('+str(k)+', '+str(u)+', '+str(v)+') =', max_pi_w
         pi[(k,u,v)] = max_pi
         bp[(k,u,v)] = max_pi_w
 
@@ -57,7 +58,7 @@ def viterbi(x_list):
   for u in K[str(n-1)]:
     for v in K[str(n)]:
       this_pi = pi[(n,u,v)] * transition('STOP',u,v)
-      if this_pi > max_pi:
+      if this_pi >= max_pi:
         y[str(n-1)] = u
         y[str(n)] = v
 
@@ -151,19 +152,20 @@ def cache_counts(lines):
 
 if __name__ == "__main__":
   print "Reading counts..."
-  counts_lines = open("gene.counts","r").readlines()
+  counts_lines = open("gene.part2.counts","r").readlines()
   cache_counts(counts_lines)
   print len(counts_lines), "lines read and cached."
 
   print "Reading dev file..."
-  # dev_lines = open("gene.dev","r").readlines()
-  dev_lines = open("gene.test","r").readlines()
+  dev_lines = open("gene.dev","r").readlines()
+  # dev_lines = open("gene.test","r").readlines()
   dev_lines = dev_lines[:]
   print len(dev_lines), "lines read."
 
   # print viterbi(["Therefore", ",", "we", "suggested", "that", "both", "proteins", "might", "belong", "to", "the", "PLTP", "family", "."])
   # print viterbi(["Finally",",","a","chromogenic","method","was","used",",","based","on","thrombin","inhibition","and","the","substrate","S","-","2238","."])
   # print viterbi(["Molecular","cloning",",","genomic","mapping",",","and","expression","of","two","secretor","blood","group","alpha","(","1",",","2",")","fucosyltransferase","genes","differentially","regulated","in","mouse","uterine","epithelium","and","gastrointestinal","tract","."])
+  # print viterbi(["STAT5A","mutations","in","the","Src","homology","2","(","SH2",")","and","SH3","domains","did","not","alter","the","BTK","-","mediated","tyrosine","phosphorylation","."])
 
   out_lines = []
 
@@ -193,6 +195,6 @@ if __name__ == "__main__":
   # print transition("O", "O", "O")
 
   print "Writing dev file..."
-  # out_file = open("gene_dev.p2.out","w")
-  out_file = open("gene_test.p2.out","w")
+  out_file = open("gene_dev.p2.out","w")
+  # out_file = open("gene_test.p2.out","w")
   out_file.writelines(out_lines)

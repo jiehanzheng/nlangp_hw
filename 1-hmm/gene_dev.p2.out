@@ -2530,7 +2530,7 @@ distinct O
 regions O
 of O
 the O
-VDR I-GENE
+VDR O
 . O
 
 RESULTS O
@@ -4270,7 +4270,7 @@ egr O
 expression O
 regulated O
 by O
-insulin I-GENE
+insulin O
 . O
 
 The O
@@ -7952,9 +7952,9 @@ cofactor I-GENE
 CREB I-GENE
 - I-GENE
 binding I-GENE
-protein I-GENE
-( I-GENE
-CBP I-GENE
+protein O
+( O
+CBP O
 ). O
 
 HSF I-GENE
@@ -8917,9 +8917,9 @@ and O
 strong O
 binding O
 of O
-NF I-GENE
-- I-GENE
-kappaB I-GENE
+NF O
+- O
+kappaB O
 . O
 
 Moreover O
@@ -14183,7 +14183,7 @@ domain O
 in O
 a O
 cytoplasmic O
-dynein I-GENE
+dynein O
 . O
 
 Immunological O
