@@ -33,7 +33,7 @@ def viterbi(x_list):
   for k in range(1,n+1):
     for u in K[str(k-1)]:
       for v in K[str(k)]:
-        max_pi = -1
+        max_pi = 0
         max_pi_w = None
         for w in K[str(k-2)]:
           # print k,x[str(k)]+'->'+w,u,v,
@@ -58,7 +58,7 @@ def viterbi(x_list):
   for u in K[str(n-1)]:
     for v in K[str(n)]:
       this_pi = pi[(n,u,v)] * transition('STOP',u,v)
-      if this_pi >= max_pi:
+      if this_pi > max_pi:
         y[str(n-1)] = u
         y[str(n)] = v
 
@@ -89,12 +89,12 @@ def count_ngram(u, v, w=None):
   occurrences of tag u,v, in addition to w if w is specified.
 
   """
-  if w:  # bigram
+  if w:  # trigram
     try:
       return counts[('3-GRAM', u, v, w)]
     except KeyError:
       pass
-  else:  # trigram
+  else:  # bigram
     try:
       return counts[('2-GRAM', u, v)]
     except KeyError:
@@ -174,25 +174,13 @@ if __name__ == "__main__":
     if len(dev_line.strip()):
       sentence_buffer.append(dev_line.strip())
     else:  # end of sentence
-      # print sentence_buffer
       tags = viterbi(sentence_buffer)
-      # print tags
-      # print
 
       for i, word in enumerate(sentence_buffer):
         out_lines.append(word + ' ' +tags[i]+'\n')
       out_lines.append('\n')
 
       sentence_buffer = []
-
-  # TESTS FOR count_ngram()
-  # print "OOO"
-  # print "uvw"
-  # print count_ngram("O", "O", "O")
-  # print "uv"
-  # print count_ngram("O", "O")
-  # print "uvw/uv"
-  # print transition("O", "O", "O")
 
   print "Writing dev file..."
   out_file = open("gene_dev.p2.out","w")

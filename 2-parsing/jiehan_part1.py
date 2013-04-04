@@ -27,8 +27,6 @@ def replace_rare(node, rare_words):
 
   return node
 
-  # FIXME: save result recursively
-
 
 def filter_rare(word_count):
   return {word for word, count in word_count.iteritems() if count < 5}
