@@ -92,9 +92,9 @@ def t(f,e):
   return 1/n(e)
 
 
-def cache_corpus(txt, corpus, append_NULL=False):
+def cache_corpus(txt, corpus, prepend_NULL=False):
   for sentence in txt:
-    if append_NULL:
+    if prepend_NULL:
       corpus.append(tuple(["NULL"] + sentence.split()))
     else:
       corpus.append(tuple(sentence.split()))
@@ -120,7 +120,7 @@ def find_alignments(spanish_sentence, english_sentence):
 if __name__ == '__main__':
   corpus_en_txt = open("corpus.en").readlines()
   # corpus_en_txt = ["the car","the house","the woman"]
-  cache_corpus(corpus_en_txt, corpus_en, append_NULL=True)
+  cache_corpus(corpus_en_txt, corpus_en, prepend_NULL=True)
 
   corpus_es_txt = open("corpus.es").readlines()
   # corpus_es_txt = ["la coche","el casa","el mujer"]
